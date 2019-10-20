@@ -1,11 +1,11 @@
 //: A UIKit based Playground for presenting user interface
-  
+
 import UIKit
 import PlaygroundSupport
 import SafariServices
 
 //
-// 本示例用于阐述「网络请求、I/O 操作等耗时操作阻塞了主线程的 UI 交互，造成卡顿」的问题（⚠️ 错误示范）
+// 本示例用于阐述异步网络请求
 // 文章详情链接：https://xiaozhuanlan.com/complete-ios-gcd （TBD：待发布后替换）
 //
 
@@ -119,9 +119,16 @@ class ListViewController : UITableViewController {
         defer { tableView.deselectRow(at: indexPath, animated: true) }
         
         let id = items[indexPath.row].0
-        let vc = ItemViewController()
-        vc.item = network.getMiniSpecialColumnDetail(withID: id) // 🚫 问题产生
-        show(vc, sender: nil)
+        // 🚫 尝试方案1：
+        DispatchQueue.global().async {
+            let item = self.network.getMiniSpecialColumnDetail(withID: id)
+            // ✅ 获取数据后异步派发 UI 更新任务到主队列
+            DispatchQueue.main.async {
+                let vc = ItemViewController()
+                vc.item = item
+                self.show(vc, sender: nil)
+            }
+        }
     }
 }
 

@@ -1,11 +1,11 @@
 //: A UIKit based Playground for presenting user interface
-  
+
 import UIKit
 import PlaygroundSupport
 import SafariServices
 
 //
-// 本示例用于阐述「网络请求、I/O 操作等耗时操作阻塞了主线程的 UI 交互，造成卡顿」的问题（⚠️ 错误示范）
+// 本示例用于阐述异步网络请求
 // 文章详情链接：https://xiaozhuanlan.com/complete-ios-gcd （TBD：待发布后替换）
 //
 
@@ -37,9 +37,14 @@ class FakeNetwork {
                      link: URL(string: "https://xiaozhuanlan.com/complete-ios-gcd")!)
     ]
     
-    func getMiniSpecialColumnDetail(withID id: String) -> MiniSpecialColumn {
-        sleep(1) // ℹ️ 模拟网络耗时 1s
-        return FakeNetwork.fakeResults[id]!
+    func getMiniSpecialColumnDetail(withID id: String, completion: @escaping (MiniSpecialColumn) -> ()) {
+        DispatchQueue.global().async {
+            sleep(1) // ℹ️ 模拟网络耗时 1s
+            let result = FakeNetwork.fakeResults[id]!
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
     }
 }
 
@@ -119,9 +124,12 @@ class ListViewController : UITableViewController {
         defer { tableView.deselectRow(at: indexPath, animated: true) }
         
         let id = items[indexPath.row].0
-        let vc = ItemViewController()
-        vc.item = network.getMiniSpecialColumnDetail(withID: id) // 🚫 问题产生
-        show(vc, sender: nil)
+        // 🤔 尝试方案2
+        network.getMiniSpecialColumnDetail(withID: id) { [weak self] item in
+            let vc = ItemViewController()
+            vc.item = item
+            self?.show(vc, sender: nil)
+        }
     }
 }
 
