@@ -47,7 +47,7 @@ class ListViewController : UITableViewController {
         
         let id = items[indexPath.row].0
         let vc = ItemViewController()
-        vc.item = network.getMiniSpecialColumnDetail(withID: id) // ⚠️ 问题产生
+        vc.item = network.getMiniSpecialColumnDetail(withID: id) // 🚫 问题产生
         show(vc, sender: nil)
     }
 }
@@ -87,7 +87,7 @@ class ItemViewController: UIViewController {
         descriptionLable.text = item.description
         
         subscribeButton.setTitleColor(themeColor, for: .normal)
-        subscribeButton.setTitle("立即订阅", for: .normal)
+        subscribeButton.setTitle("马上订阅", for: .normal)
         subscribeButton.addTarget(self, action: #selector(subscribeAction), for: .touchUpInside)
     }
     
