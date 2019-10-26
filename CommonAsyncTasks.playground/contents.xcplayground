@@ -4,5 +4,6 @@
         <page name='UserInteractionIssue'/>
         <page name='NetworkInBackgroundTry1'/>
         <page name='NetworkInBackgroundTry2'/>
+        <page name='NetworkInBackgroundOptimize1'/>
     </pages>
 </playground>
